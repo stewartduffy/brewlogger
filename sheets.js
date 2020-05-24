@@ -2,6 +2,8 @@ require("dotenv").config();
 const { google } = require("googleapis");
 const axios = require("axios");
 
+const { BREWFATHER_STREAM_ID, SPREADSHEET_ID } = process.env;
+
 function constructPayload(rows) {
   const temp = rows[0][2];
   const gravity = rows[0][1];
@@ -14,12 +16,11 @@ function constructPayload(rows) {
     name: "Brewlogger",
     temp_unit: "C",
     gravity_unit: "G",
-    comment: "Hello World"
+    comment: "Hello World",
   };
 }
 
 async function postReadings(payload) {
-  const BREWFATHER_STREAM_ID = process.env.BREWFATHER_STREAM_ID;
   const BREWFATHER_ENDPOINT = `http://log.brewfather.net/stream?id=${BREWFATHER_STREAM_ID}`;
 
   try {
@@ -35,15 +36,15 @@ async function postReadings(payload) {
 const main = async () => {
   const auth = await google.auth.getClient({
     scopes: ["https://www.googleapis.com/auth/spreadsheets"],
-    keyFilename: "./credentials.json"
+    keyFilename: "./credentials.json",
   });
 
   const sheets = google.sheets({ version: "v4", auth });
 
   try {
     const { data } = await sheets.spreadsheets.values.get({
-      spreadsheetId: "1dRau2UdMHiqDWgrnJ6IPyBUkHlowrVXNVAuA-ShtS4k",
-      range: "C2:G2"
+      spreadsheetId: SPREADSHEET_ID,
+      range: "C2:G2",
     });
 
     const rows = data.values;
